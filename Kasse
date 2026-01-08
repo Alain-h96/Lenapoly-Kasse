@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<title>Spielgeld-Kasse</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2;
+    margin: 0;
+    padding: 14px;
+}
+
+h1 {
+    text-align: center;
+    margin: 6px 0 12px;
+}
+
+.container {
+    display: flex;
+    gap: 14px;
+}
+
+/* PRODUKTE */
+#grid {
+    flex: 2;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+}
+
+.product {
+    background: white;
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.product-img {
+    font-size: 42px;
+}
+
+.product-name {
+    font-size: 14px;
+}
+
+.product-price {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* WARENKORB */
+#cart {
+    flex: 1;
+    background: white;
+    border-radius: 14px;
+    padding: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.cart-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.cart-controls button {
+    padding: 2px 8px;
+    font-size: 16px;
+}
+
+.cart-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.cart-buttons button {
+    flex: 1;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 10px;
+    border: none;
+    cursor: pointer;
+}
+
+.clear { background: #ff4d4d; color: white; }
+.pay   { background: #4CAF50; color: white; }
+
+#total {
+    font-size: 22px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 10px;
+}
+
+/* MODALS */
+#numpad, #popup {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal {
+    background: white;
+    border-radius: 14px;
+    padding: 16px;
+    width: 280px;
+}
+
+.modal h3 {
+    text-align: center;
+    margin-top: 0;
+}
+
+#qtyInput {
+    width: 100%;
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.pad-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+}
+
+.pad-grid button {
+    padding: 14px;
+    font-size: 18px;
+}
+
+.confirm {
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 8px;
+}
+
+/* KIOSK */
+#kiosk {
+    text-align: center;
+    margin-bottom: 6px;
+}
+#kiosk button {
+    padding: 6px 12px;
+    border-radius: 8px;
+}
+</style>
+</head>
+
+<body>
+
+<div id="kiosk">
+    <button onclick="openFullscreen()">🔒 Vollbild (Kiosk)</button>
+</div>
+
+<h1>🧾 Spielgeld-Kasse</h1>
+
+<div class="container">
+    <div id="grid"></div>
+
+    <div id="cart">
+        <h3>Warenkorb</h3>
+        <div id="cartItems"></div>
+        <div id="total">Gesamt: 0 💰</div>
+
+        <div class="cart-buttons">
+            <button class="clear" onclick="clearCart()">Leeren</button>
+            <button class="pay" onclick="pay()">Bezahlen</button>
+        </div>
+    </div>
+</div>
+
+<!-- ZAHLENFELD -->
+<div id="numpad" onclick="closePad(event)">
+    <div class="modal">
+        <input id="qtyInput" readonly value="1">
+        <div class="pad-grid">
+            <button onclick="addNum(1)">1</button>
+            <button onclick="addNum(2)">2</button>
+            <button onclick="addNum(3)">3</button>
+            <button onclick="addNum(4)">4</button>
+            <button onclick="addNum(5)">5</button>
+            <button onclick="addNum(6)">6</button>
+            <button onclick="addNum(7)">7</button>
+            <button onclick="addNum(8)">8</button>
+            <button onclick="addNum(9)">9</button>
+            <button onclick="clearNum()">C</button>
+            <button onclick="addNum(0)">0</button>
+            <button class="confirm" onclick="confirmQty()">OK</button>
+        </div>
+    </div>
+</div>
+
+<!-- BEZAHL POPUP -->
+<div id="popup">
+    <div class="modal">
+        <h3>Bezahlung</h3>
+        <div id="receipt"></div>
+        <button class="confirm" style="width:100%;margin-top:10px" onclick="finishPayment()">OK</button>
+    </div>
+</div>
+
+<script>
+let cart = {};
+let currentProduct = null;
+
+const products = [
+["Apfel",2000,"🍎"],["Banane",1800,"🍌"],["Orange",2200,"🍊"],
+["Cola",2500,"🥤"],["Wasser",1200,"💧"],["Saft",3000,"🧃"],
+["Burger",5000,"🍔"],["Pommes",3500,"🍟"],["Pizza",6000,"🍕"],
+["Hotdog",4000,"🌭"],["Donut",2000,"🍩"],["Kuchen",4500,"🍰"],
+["Eis",2800,"🍦"],["Schokolade",3200,"🍫"],["Kekse",2600,"🍪"],
+["Chips",2400,"🥔"],["Popcorn",2300,"🍿"],["Nachos",3800,"🧀"],
+["Kaffee",2700,"☕"],["Tee",1900,"🍵"],["Energy",4200,"⚡"],
+["Smoothie",4800,"🥤"],["Milchshake",4600,"🥛"],["Wrap",5200,"🌯"],
+["Salat",4100,"🥗"],["Sandwich",4300,"🥪"],["Croissant",2900,"🥐"],
+["Muffin",3100,"🧁"],["Waffel",3600,"🧇"],["Brownie",3400,"🍫"]
+];
+
+const grid = document.getElementById("grid");
+
+products.forEach(p=>{
+    const d=document.createElement("div");
+    d.className="product";
+    d.innerHTML=`<div class="product-img">${p[2]}</div>
+                 <div class="product-name">${p[0]}</div>
+                 <div class="product-price">${p[1]} 💰</div>`;
+    d.onclick=()=>openPad(p);
+    grid.appendChild(d);
+});
+
+function openPad(p){
+    currentProduct=p;
+    qtyInput.value=1;
+    numpad.style.display="flex";
+}
+
+function closePad(e){
+    if(e.target.id==="numpad"){
+        numpad.style.display="none";
+    }
+}
+
+function addNum(n){
+    qtyInput.value = qtyInput.value==="0" ? n : qtyInput.value+n;
+}
+function clearNum(){ qtyInput.value="0"; }
+
+function confirmQty(){
+    const q=parseInt(qtyInput.value);
+    if(q>0){
+        const n=currentProduct[0];
+        if(!cart[n]) cart[n]={price:currentProduct[1],qty:0};
+        cart[n].qty+=q;
+        updateCart();
+    }
+    numpad.style.display="none";
+}
+
+function updateCart(){
+    const c=document.getElementById("cartItems");
+    c.innerHTML="";
+    let total=0;
+
+    for(const k in cart){
+        const item=cart[k];
+        total+=item.price*item.qty;
+
+        const div=document.createElement("div");
+        div.className="cart-item";
+        div.innerHTML=`
+            ${k} (${item.qty})
+            <span class="cart-controls">
+                <button onclick="changeQty('${k}',-1)">−</button>
+                <button onclick="changeQty('${k}',1)">+</button>
+            </span>`;
+        c.appendChild(div);
+    }
+
+    document.getElementById("total").innerText =
+        "Gesamt: " + total + " 💰";
+}
+
+function changeQty(k,d){
+    cart[k].qty+=d;
+    if(cart[k].qty<=0) delete cart[k];
+    updateCart();
+}
+
+function clearCart(){
+    cart={};
+    updateCart();
+}
+
+function pay(){
+    if(Object.keys(cart).length===0) return;
+    let html="", sum=0;
+    for(const k in cart){
+        const i=cart[k];
+        html+=`${k}: ${i.qty} × ${i.price} = ${i.qty*i.price} 💰<br>`;
+        sum+=i.qty*i.price;
+    }
+    html+=`<hr><b>Gesamt: ${sum} 💰</b>`;
+    receipt.innerHTML=html;
+    popup.style.display="flex";
+}
+
+function finishPayment(){
+    popup.style.display="none";
+    clearCart();
+}
+
+function openFullscreen(){
+    document.documentElement.requestFullscreen?.();
+}
+</script>
+
+</body>
+</html>
