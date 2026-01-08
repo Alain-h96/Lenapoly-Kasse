@@ -191,7 +191,7 @@ let balance=parseInt(localStorage.getItem(walletKey)||100);
 updateWallet();
 
 function updateWallet(){
-  balanceEl.innerText=balance+" 💰 (Hier klicken, um anzupassen)";
+  balanceEl.innerText=balance+" 💰 (Hier klicken)";
   localStorage.setItem(walletKey,balance);
 }
 function toggleWallet(){
