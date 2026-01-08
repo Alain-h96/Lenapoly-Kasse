@@ -2,326 +2,292 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
-<title>Spielgeld-Kasse</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spielgeld Kasse + Wallet</title>
 
 <style>
-body {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2;
-    margin: 0;
-    padding: 14px;
+body{
+  font-family: Arial, sans-serif;
+  background:#f2f2f2;
+  margin:0;
+  padding:12px;
+}
+h1{text-align:center;margin:8px 0;}
+
+/* LAYOUT */
+.container{
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
 
-h1 {
-    text-align: center;
-    margin: 6px 0 12px;
+/* WALLET + CART */
+.panel{
+  background:white;
+  border-radius:12px;
+  padding:12px;
 }
 
-.container {
-    display: flex;
-    gap: 14px;
+/* WALLET */
+.balance{
+  font-size:24px;
+  font-weight:bold;
+  cursor:pointer;
 }
-
-/* PRODUKTE */
-#grid {
-    flex: 2;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 14px;
-}
-
-.product {
-    background: white;
-    border-radius: 14px;
-    padding: 12px;
-    text-align: center;
-    cursor: pointer;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.product-img {
-    font-size: 42px;
-}
-
-.product-name {
-    font-size: 14px;
-}
-
-.product-price {
-    font-size: 16px;
-    font-weight: bold;
-}
+#walletDetails{display:none}
 
 /* WARENKORB */
-#cart {
-    flex: 1;
-    background: white;
-    border-radius: 14px;
-    padding: 12px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+.cart-item{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:6px;
 }
+.cart-controls button{margin-left:4px}
 
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 6px;
+/* PRODUKTE */
+#grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
 }
-
-.cart-controls button {
-    padding: 2px 8px;
-    font-size: 16px;
+.product{
+  background:white;
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
+  cursor:pointer;
 }
+.product-img{font-size:36px}
+.product-price{font-weight:bold}
 
-.cart-buttons {
-    display: flex;
-    gap: 8px;
-    margin-top: 10px;
+/* BUTTONS */
+button{
+  padding:8px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
 }
+.pay{background:#4CAF50;color:white}
+.clear{background:#ff4d4d;color:white}
+.add{background:#2196F3;color:white}
+.sub{background:#ff9800;color:white}
+.full{width:100%;margin-top:6px}
 
-.cart-buttons button {
-    flex: 1;
-    padding: 10px;
-    font-size: 16px;
-    border-radius: 10px;
-    border: none;
-    cursor: pointer;
-}
-
-.clear { background: #ff4d4d; color: white; }
-.pay   { background: #4CAF50; color: white; }
-
-#total {
-    font-size: 22px;
-    font-weight: bold;
-    text-align: center;
-    margin-top: 10px;
+input{
+  width:100%;
+  padding:6px;
+  font-size:16px;
+  margin-top:6px;
 }
 
 /* MODALS */
-#numpad, #popup {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.45);
-    display: none;
-    justify-content: center;
-    align-items: center;
+#numpad,#receiptOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.4);
+  display:none;
+  justify-content:center;
+  align-items:center;
 }
+.modal{
+  background:white;
+  padding:16px;
+  border-radius:12px;
+  width:260px;
+}
+.pad-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+}
+.pad-grid button{padding:14px;font-size:18px}
 
-.modal {
-    background: white;
-    border-radius: 14px;
-    padding: 16px;
-    width: 280px;
-}
-
-.modal h3 {
-    text-align: center;
-    margin-top: 0;
-}
-
-#qtyInput {
-    width: 100%;
-    font-size: 24px;
-    text-align: center;
-    margin-bottom: 10px;
-}
-
-.pad-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-}
-
-.pad-grid button {
-    padding: 14px;
-    font-size: 18px;
-}
-
-.confirm {
-    background: #4CAF50;
-    color: white;
-    border: none;
-    border-radius: 8px;
-}
-
-/* KIOSK */
-#kiosk {
-    text-align: center;
-    margin-bottom: 6px;
-}
-#kiosk button {
-    padding: 6px 12px;
-    border-radius: 8px;
+/* TABLET */
+@media(min-width:900px){
+  #grid{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
 
 <body>
 
-<div id="kiosk">
-    <button onclick="openFullscreen()">🔒 Vollbild (Kiosk)</button>
-</div>
-
 <h1>🧾 Spielgeld-Kasse</h1>
 
 <div class="container">
-    <div id="grid"></div>
 
-    <div id="cart">
-        <h3>Warenkorb</h3>
-        <div id="cartItems"></div>
-        <div id="total">Gesamt: 0 💰</div>
+  <!-- WALLET -->
+  <div class="panel">
+    <h3>💰 Wallet</h3>
+    <div id="player"></div>
+    <div class="balance" id="balance" onclick="toggleWallet()"></div>
 
-        <div class="cart-buttons">
-            <button class="clear" onclick="clearCart()">Leeren</button>
-            <button class="pay" onclick="pay()">Bezahlen</button>
-        </div>
+    <div id="walletDetails">
+      <input type="number" id="amount" placeholder="Betrag eingeben">
+      <button class="add full" onclick="walletAdd()">➕ Hinzufügen</button>
+      <button class="sub full" onclick="walletSub()">➖ Abziehen</button>
     </div>
+  </div>
+
+  <!-- WARENKORB -->
+  <div class="panel">
+    <h3>🛒 Warenkorb</h3>
+    <div id="cartItems"></div>
+    <div id="total">Gesamt: 0 💰</div>
+    <button class="pay full" onclick="pay()">Bezahlen</button>
+    <button class="clear full" onclick="clearCart()">Leeren</button>
+  </div>
+
+  <!-- PRODUKTE -->
+  <div id="grid"></div>
+
 </div>
 
-<!-- ZAHLENFELD -->
-<div id="numpad" onclick="closePad(event)">
-    <div class="modal">
-        <input id="qtyInput" readonly value="1">
-        <div class="pad-grid">
-            <button onclick="addNum(1)">1</button>
-            <button onclick="addNum(2)">2</button>
-            <button onclick="addNum(3)">3</button>
-            <button onclick="addNum(4)">4</button>
-            <button onclick="addNum(5)">5</button>
-            <button onclick="addNum(6)">6</button>
-            <button onclick="addNum(7)">7</button>
-            <button onclick="addNum(8)">8</button>
-            <button onclick="addNum(9)">9</button>
-            <button onclick="clearNum()">C</button>
-            <button onclick="addNum(0)">0</button>
-            <button class="confirm" onclick="confirmQty()">OK</button>
-        </div>
+<!-- NUMPAD -->
+<div id="numpad" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal">
+    <h3>Menge</h3>
+    <input id="qtyInput" readonly value="1" style="width:100%;font-size:22px;text-align:center">
+    <div class="pad-grid">
+      <button onclick="addNum(1)">1</button><button onclick="addNum(2)">2</button><button onclick="addNum(3)">3</button>
+      <button onclick="addNum(4)">4</button><button onclick="addNum(5)">5</button><button onclick="addNum(6)">6</button>
+      <button onclick="addNum(7)">7</button><button onclick="addNum(8)">8</button><button onclick="addNum(9)">9</button>
+      <button onclick="clearNum()">C</button><button onclick="addNum(0)">0</button>
+      <button class="pay" onclick="confirmQty()">OK</button>
     </div>
+  </div>
 </div>
 
-<!-- BEZAHL POPUP -->
-<div id="popup">
-    <div class="modal">
-        <h3>Bezahlung</h3>
-        <div id="receipt"></div>
-        <button class="confirm" style="width:100%;margin-top:10px" onclick="finishPayment()">OK</button>
-    </div>
+<!-- QUITTUNG -->
+<div id="receiptOverlay" onclick="if(event.target===this)this.style.display='none'">
+  <div class="modal">
+    <h3>🧾 Quittung</h3>
+    <div id="receiptContent"></div>
+    <button class="pay full" onclick="receiptOverlay.style.display='none'">OK</button>
+  </div>
 </div>
 
 <script>
-let cart = {};
-let currentProduct = null;
+// DOM
+const grid=document.getElementById("grid");
+const cartItems=document.getElementById("cartItems");
+const total=document.getElementById("total");
+const balanceEl=document.getElementById("balance");
+const amount=document.getElementById("amount");
+const playerEl=document.getElementById("player");
+const receiptOverlay=document.getElementById("receiptOverlay");
+const receiptContent=document.getElementById("receiptContent");
+const numpad=document.getElementById("numpad");
+const qtyInput=document.getElementById("qtyInput");
+const walletDetails=document.getElementById("walletDetails");
 
-const products = [
-["Apfelringe",2000,"<img src='Apfelringe.png'>"],["Banane",1800,"🍌"],["Orange",2200,"🍊"],
-["Cola",2500,"🥤"],["Wasser",1200,"💧"],["Saft",3000,"🧃"],
-["Burger",5000,"🍔"],["Pommes",3500,"🍟"],["Pizza",6000,"🍕"],
-["Hotdog",4000,"🌭"],["Donut",2000,"🍩"],["Kuchen",4500,"🍰"],
-["Eis",2800,"🍦"],["Schokolade",3200,"🍫"],["Kekse",2600,"🍪"],
-["Chips",2400,"🥔"],["Popcorn",2300,"🍿"],["Nachos",3800,"🧀"],
-["Kaffee",2700,"☕"],["Tee",1900,"🍵"],["Energy",4200,"⚡"],
-["Smoothie",4800,"🥤"],["Milchshake",4600,"🥛"],["Wrap",5200,"🌯"],
-["Salat",4100,"🥗"],["Sandwich",4300,"🥪"],["Croissant",2900,"🥐"],
-["Muffin",3100,"🧁"],["Waffel",3600,"🧇"],["Brownie",3400,"🍫"]
+// WALLET
+const params=new URLSearchParams(location.search);
+const player=params.get("player")||"gast";
+const walletKey="wallet_"+player;
+playerEl.innerText="Spieler: "+player;
+
+let balance=parseInt(localStorage.getItem(walletKey)||100);
+updateWallet();
+
+function updateWallet(){
+  balanceEl.innerText=balance+" 💰 (antippen)";
+  localStorage.setItem(walletKey,balance);
+}
+function toggleWallet(){
+  walletDetails.style.display=walletDetails.style.display==="none"?"block":"none";
+}
+function walletAdd(){
+  const v=parseInt(amount.value); if(!v) return;
+  balance+=v; updateWallet(); amount.value="";
+}
+function walletSub(){
+  const v=parseInt(amount.value); if(!v) return;
+  balance-=v; if(balance<0) alert("⚠️ Wallet im Minus!");
+  updateWallet(); amount.value="";
+}
+
+// PRODUKTE
+const products=[
+["🍭 Lolli",60],["🍬 Bonbons",80],["🍫 Mini-Schoko",110],
+["🍪 Keks",250],["🍫 Schokoriegel",300],["🧇 Waffel",320],
+["🍬 Gummibärchen",280],["🍿 Popcorn",450],["🥨 Salzstangen",220],
+["🍩 Donut",300],["🧁 Muffin",320],["🍰 Kuchenstück",350],
+["🍦 Eis",280],["🍫 Brownie",300],["🥐 Croissant",260],
+["🍪 Doppelkeks",300],["🍫 Nussriegel",330],["🍭 Zuckerstange",120],
+["🍬 Karamell",150],["🍪 Cookie",250],["🍿 Popcorn XL",650],
+["🍫 Mega-Riegel",550],["🍭 Süß-Mix",900],["🎁 Überraschung",900],
+["🎉 Party-Box",1100],["🍫 Gold-Schoko",1300],["🍬 XXL-Mix",1000],
+["🍪 Familien-Pack",700],["🍿 Kino-Set",650],["🏆 Jackpot-Box",1300]
 ];
 
-const grid = document.getElementById("grid");
+let cart={}, currentProduct=null;
 
 products.forEach(p=>{
-    const d=document.createElement("div");
-    d.className="product";
-    d.innerHTML=`<div class="product-img">${p[2]}</div>
-                 <div class="product-name">${p[0]}</div>
-                 <div class="product-price">${p[1]} 💰</div>`;
-    d.onclick=()=>openPad(p);
-    grid.appendChild(d);
+  const d=document.createElement("div");
+  d.className="product";
+  d.innerHTML=`
+    <div class="product-img">${p[0].split(" ")[0]}</div>
+    <div>${p[0]}</div>
+    <div class="product-price">${p[1]} 💰</div>`;
+  d.onclick=()=>openPad(p);
+  grid.appendChild(d);
 });
 
-function openPad(p){
-    currentProduct=p;
-    qtyInput.value=1;
-    numpad.style.display="flex";
-}
-
-function closePad(e){
-    if(e.target.id==="numpad"){
-        numpad.style.display="none";
-    }
-}
-
-function addNum(n){
-    qtyInput.value = qtyInput.value==="0" ? n : qtyInput.value+n;
-}
-function clearNum(){ qtyInput.value="0"; }
-
+// NUMPAD
+function openPad(p){currentProduct=p;qtyInput.value="1";numpad.style.display="flex";}
+function addNum(n){qtyInput.value=qtyInput.value==="0"?n:qtyInput.value+n;}
+function clearNum(){qtyInput.value="0";}
 function confirmQty(){
-    const q=parseInt(qtyInput.value);
-    if(q>0){
-        const n=currentProduct[0];
-        if(!cart[n]) cart[n]={price:currentProduct[1],qty:0};
-        cart[n].qty+=q;
-        updateCart();
-    }
-    numpad.style.display="none";
+  const q=parseInt(qtyInput.value);
+  if(q>0){
+    const [name,price]=currentProduct;
+    if(!cart[name]) cart[name]={price,qty:0};
+    cart[name].qty+=q;
+    updateCart();
+  }
+  numpad.style.display="none";
 }
 
+// WARENKORB
 function updateCart(){
-    const c=document.getElementById("cartItems");
-    c.innerHTML="";
-    let total=0;
-
-    for(const k in cart){
-        const item=cart[k];
-        total+=item.price*item.qty;
-
-        const div=document.createElement("div");
-        div.className="cart-item";
-        div.innerHTML=`
-            ${k} (${item.qty})
-            <span class="cart-controls">
-                <button onclick="changeQty('${k}',-1)">−</button>
-                <button onclick="changeQty('${k}',1)">+</button>
-            </span>`;
-        c.appendChild(div);
-    }
-
-    document.getElementById("total").innerText =
-        "Gesamt: " + total + " 💰";
+  cartItems.innerHTML="";
+  let sum=0;
+  for(const k in cart){
+    const i=cart[k];
+    sum+=i.price*i.qty;
+    cartItems.innerHTML+=`
+      <div class="cart-item">
+        ${k} (${i.qty})
+        <span class="cart-controls">
+          <button onclick="changeQty('${k}',-1)">−</button>
+          <button onclick="changeQty('${k}',1)">+</button>
+        </span>
+      </div>`;
+  }
+  total.innerText="Gesamt: "+sum+" 💰";
 }
-
 function changeQty(k,d){
-    cart[k].qty+=d;
-    if(cart[k].qty<=0) delete cart[k];
-    updateCart();
+  cart[k].qty+=d;
+  if(cart[k].qty<=0) delete cart[k];
+  updateCart();
 }
+function clearCart(){cart={};updateCart();}
 
-function clearCart(){
-    cart={};
-    updateCart();
-}
-
+// BEZAHLEN
 function pay(){
-    if(Object.keys(cart).length===0) return;
-    let html="", sum=0;
-    for(const k in cart){
-        const i=cart[k];
-        html+=`${k}: ${i.qty} × ${i.price} = ${i.qty*i.price} 💰<br>`;
-        sum+=i.qty*i.price;
-    }
-    html+=`<hr><b>Gesamt: ${sum} 💰</b>`;
-    receipt.innerHTML=html;
-    popup.style.display="flex";
-}
-
-function finishPayment(){
-    popup.style.display="none";
-    clearCart();
-}
-
-function openFullscreen(){
-    document.documentElement.requestFullscreen?.();
+  let sum=0, html="";
+  for(const k in cart){
+    const i=cart[k];
+    sum+=i.price*i.qty;
+    html+=`${k}: ${i.qty} × ${i.price} = ${i.qty*i.price} 💰<br>`;
+  }
+  if(sum===0) return;
+  if(balance-sum<0){alert("⚠️ Nicht genug Guthaben!");return;}
+  balance-=sum; updateWallet();
+  receiptContent.innerHTML=html+`<hr><b>Gesamt: ${sum} 💰</b>`;
+  receiptOverlay.style.display="flex";
+  clearCart();
 }
 </script>
 
