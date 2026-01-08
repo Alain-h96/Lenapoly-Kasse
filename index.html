@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Spielgeld Kasse + Wallet</title>
+<title>Nostalgie Shop</title>
 
 <style>
 body{
@@ -112,7 +112,7 @@ input{
 
 <body>
 
-<h1>🧾 Spielgeld-Kasse</h1>
+<h1>🧾 Nostalgie Shop</h1>
 
 <div class="container">
 
@@ -191,7 +191,7 @@ let balance=parseInt(localStorage.getItem(walletKey)||100);
 updateWallet();
 
 function updateWallet(){
-  balanceEl.innerText=balance+" 💰 (antippen)";
+  balanceEl.innerText=balance+" 💰 (auf wallet zugreifen)";
   localStorage.setItem(walletKey,balance);
 }
 function toggleWallet(){
