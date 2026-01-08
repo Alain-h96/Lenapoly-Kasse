@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nostalgie Shop</title>
+<title>Lenapoly – Spielgeld Kasse</title>
 
 <style>
 body{
@@ -21,7 +21,7 @@ h1{text-align:center;margin:8px 0;}
   gap:12px;
 }
 
-/* WALLET + CART */
+/* PANELS */
 .panel{
   background:white;
   border-radius:12px;
@@ -49,7 +49,7 @@ h1{text-align:center;margin:8px 0;}
 #grid{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:10px;
+  gap:12px;
 }
 .product{
   background:white;
@@ -58,7 +58,12 @@ h1{text-align:center;margin:8px 0;}
   text-align:center;
   cursor:pointer;
 }
-.product-img{font-size:36px}
+.product-img img{
+  width:100%;
+  max-width:90px;
+  height:90px;
+  object-fit:contain;
+}
 .product-price{font-weight:bold}
 
 /* BUTTONS */
@@ -112,7 +117,7 @@ input{
 
 <body>
 
-<h1>🧾 Nostalgie Shop</h1>
+<h1>🧾 Lenapoly-Kasse</h1>
 
 <div class="container">
 
@@ -147,7 +152,8 @@ input{
 <div id="numpad" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal">
     <h3>Menge</h3>
-    <input id="qtyInput" readonly value="1" style="width:100%;font-size:22px;text-align:center">
+    <input id="qtyInput" readonly value="1"
+           style="width:100%;font-size:22px;text-align:center">
     <div class="pad-grid">
       <button onclick="addNum(1)">1</button><button onclick="addNum(2)">2</button><button onclick="addNum(3)">3</button>
       <button onclick="addNum(4)">4</button><button onclick="addNum(5)">5</button><button onclick="addNum(6)">6</button>
@@ -168,7 +174,7 @@ input{
 </div>
 
 <script>
-// DOM
+// ---------- DOM ----------
 const grid=document.getElementById("grid");
 const cartItems=document.getElementById("cartItems");
 const total=document.getElementById("total");
@@ -181,7 +187,7 @@ const numpad=document.getElementById("numpad");
 const qtyInput=document.getElementById("qtyInput");
 const walletDetails=document.getElementById("walletDetails");
 
-// WALLET
+// ---------- WALLET ----------
 const params=new URLSearchParams(location.search);
 const player=params.get("player")||"gast";
 const walletKey="wallet_"+player;
@@ -191,11 +197,12 @@ let balance=parseInt(localStorage.getItem(walletKey)||100);
 updateWallet();
 
 function updateWallet(){
-  balanceEl.innerText=balance+" 💰 (Hier klicken)";
+  balanceEl.innerText=balance+" 💰 (antippen)";
   localStorage.setItem(walletKey,balance);
 }
 function toggleWallet(){
-  walletDetails.style.display=walletDetails.style.display==="none"?"block":"none";
+  walletDetails.style.display=
+    walletDetails.style.display==="none"?"block":"none";
 }
 function walletAdd(){
   const v=parseInt(amount.value); if(!v) return;
@@ -207,18 +214,36 @@ function walletSub(){
   updateWallet(); amount.value="";
 }
 
-// PRODUKTE
+// ---------- PRODUKTE (DEINE LISTE) ----------
 const products=[
-["🍭 Lolli",60],["🍬 Bonbons",80],["🍫 Mini-Schoko",110],
-["🍪 Keks",250],["🍫 Schokoriegel",300],["🧇 Waffel",320],
-["🍬 Gummibärchen",280],["🍿 Popcorn",450],["🥨 Salzstangen",220],
-["🍩 Donut",300],["🧁 Muffin",320],["🍰 Kuchenstück",350],
-["🍦 Eis",280],["🍫 Brownie",300],["🥐 Croissant",260],
-["🍪 Doppelkeks",300],["🍫 Nussriegel",330],["🍭 Zuckerstange",120],
-["🍬 Karamell",150],["🍪 Cookie",250],["🍿 Popcorn XL",650],
-["🍫 Mega-Riegel",550],["🍭 Süß-Mix",900],["🎁 Überraschung",900],
-["🎉 Party-Box",1100],["🍫 Gold-Schoko",1300],["🍬 XXL-Mix",1000],
-["🍪 Familien-Pack",700],["🍿 Kino-Set",650],["🏆 Jackpot-Box",1300]
+["Haribo Einzelteile",10,"haribo_einzelteile.png"],
+["Kaubonbons",10,"kaubonbons.png"],
+["Apfelringe",15,"apfelringe.png"],
+["Glühwürmchen (sauer)",15,"gluehwuermchen_sauer.png"],
+["Nimm Zwei",20,"nimm_zwei.png"],
+["Maoam",25,"maoam.png"],
+["Haribo Vegan Tütchen",40,"haribo_tuete_vegan.png"],
+["Haribo Tütchen",40,"haribo_tuete.png"],
+["Bounty",40,"bounty.png"],
+["Yogurette",60,"yogurette.png"],
+["Milky Way",60,"milkyway.png"],
+["Amicelli",80,"amicelli.png"],
+["KitKat",80,"kitkat.png"],
+["KitKat White",90,"kitkat_white.png"],
+["Snickers",100,"snickers.png"],
+["Mars",100,"mars.png"],
+["Twix White",110,"twix_white.png"],
+["Kinder Country",120,"kinder_country.png"],
+["Knoppers",120,"knoppers.png"],
+["Seifenblasen",300,"seifenblasen.png"],
+["Flummi bunt (klein)",700,"flummi_bunt_klein.png"],
+["Flummi glitzer (klein)",750,"flummi_glitzer_klein.png"],
+["Flummi bunt (groß)",800,"flummi_bunt_gross.png"],
+["Flummi glitzer (groß)",850,"flummi_glitzer_gross.png"],
+["Squishy Balls",1000,"squishy_balls.png"],
+["Mini Lego",1200,"mini_lego.png"],
+["Return Ball",1500,"return_ball.png"],
+["Pac-Man Konsole",3000,"pacman.png"]
 ];
 
 let cart={}, currentProduct=null;
@@ -227,16 +252,24 @@ products.forEach(p=>{
   const d=document.createElement("div");
   d.className="product";
   d.innerHTML=`
-    <div class="product-img">${p[0].split(" ")[0]}</div>
+    <div class="product-img">
+      <img src="images/${p[2]}" alt="${p[0]}">
+    </div>
     <div>${p[0]}</div>
     <div class="product-price">${p[1]} 💰</div>`;
   d.onclick=()=>openPad(p);
   grid.appendChild(d);
 });
 
-// NUMPAD
-function openPad(p){currentProduct=p;qtyInput.value="1";numpad.style.display="flex";}
-function addNum(n){qtyInput.value=qtyInput.value==="0"?n:qtyInput.value+n;}
+// ---------- NUMPAD ----------
+function openPad(p){
+  currentProduct=p;
+  qtyInput.value="1";
+  numpad.style.display="flex";
+}
+function addNum(n){
+  qtyInput.value=qtyInput.value==="0"?n:qtyInput.value+n;
+}
 function clearNum(){qtyInput.value="0";}
 function confirmQty(){
   const q=parseInt(qtyInput.value);
@@ -249,7 +282,7 @@ function confirmQty(){
   numpad.style.display="none";
 }
 
-// WARENKORB
+// ---------- WARENKORB ----------
 function updateCart(){
   cartItems.innerHTML="";
   let sum=0;
@@ -274,7 +307,7 @@ function changeQty(k,d){
 }
 function clearCart(){cart={};updateCart();}
 
-// BEZAHLEN
+// ---------- BEZAHLEN ----------
 function pay(){
   let sum=0, html="";
   for(const k in cart){
