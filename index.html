@@ -12,7 +12,7 @@ body{
   margin:0;
   padding:12px;
 }
-h1{text-align:center;margin:8px 0;}
+h1{text-align:center;margin:8px 0; color: white;}
 
 /* LAYOUT */
 .container{
@@ -117,7 +117,7 @@ input{
 
 <body>
 
-<h1>🧾 Lenapoly- Nostalgie Shop</h1>
+<h1>🧾 Nostalgie Shop</h1>
 
 <div class="container">
 
@@ -197,7 +197,7 @@ let balance=parseInt(localStorage.getItem(walletKey)||100);
 updateWallet();
 
 function updateWallet(){
-  balanceEl.innerText=balance+" 💰 (antippen)";
+  balanceEl.innerText=balance+" 💰 Guthaben (antippen)";
   localStorage.setItem(walletKey,balance);
 }
 function toggleWallet(){
